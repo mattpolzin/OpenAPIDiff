@@ -64,14 +64,14 @@ extension OpenAPI.PathItem: ApiComparable {
                 description.compare(to: other.description, in: "description"),
                 servers.compare(to: other.servers, in: "servers"),
                 parameters.compare(to: other.parameters, in: "parameters"),
-                get.compare(to: other.get, in: "GET"),
-                put.compare(to: other.put, in: "PUT"),
-                post.compare(to: other.post, in: "POST"),
-                delete.compare(to: other.delete, in: "DELETE"),
-                options.compare(to: other.options, in: "OPTIONS"),
-                head.compare(to: other.head, in: "HEAD"),
-                patch.compare(to: other.patch, in: "PATCH"),
-                trace.compare(to: other.trace, in: "TRACE")
+                get.compare(to: other.get, in: "GET endpoint"),
+                put.compare(to: other.put, in: "PUT endpoint"),
+                post.compare(to: other.post, in: "POST endpoint"),
+                delete.compare(to: other.delete, in: "DELETE endpoint"),
+                options.compare(to: other.options, in: "OPTIONS endpoint"),
+                head.compare(to: other.head, in: "HEAD endpoint"),
+                patch.compare(to: other.patch, in: "PATCH endpoint"),
+                trace.compare(to: other.trace, in: "TRACE endpoint")
             ]
         )
     }
@@ -159,13 +159,17 @@ extension OpenAPI.Document: ApiComparable {
 
 // MARK: - ApiContext
 extension OpenAPI.PathComponents: ApiContext {
-    public var apiContext: String { rawValue }
+    public var apiContext: String { "**\(rawValue)**" }
 }
 
 extension OpenAPI.PathItem.Parameter: ApiContext {
     public var apiContext: String {
-        "\(required ? "required " : "")\(name)"
+        "\(required ? "_required_ " : "")`\(name)`"
     }
+}
+
+extension OpenAPI.HttpVerb: ApiContext {
+    public var apiContext: String { "`\(rawValue)`" }
 }
 
 extension JSONReference: ApiContext {

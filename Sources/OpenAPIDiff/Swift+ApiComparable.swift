@@ -63,6 +63,16 @@ func identitiesMatch(_ left: Any, _ right: Any) -> Bool {
     return false
 }
 
+fileprivate func ordinalStr(_ idx: Int) -> String {
+    let ordinal = idx + 1
+    switch ordinal {
+    case 1: return "1st"
+    case 2: return "2nd"
+    case 3: return "3rd"
+    default: return "\(ordinal)th"
+    }
+}
+
 extension Array: ApiComparable where Element: Equatable, Element: ApiComparable {
     public func compare(to other: Self, in context: String? = nil) -> ApiDiff {
         let changes: [ApiDiff] = self.enumerated().map { (offset, element) in
@@ -70,7 +80,7 @@ extension Array: ApiComparable where Element: Equatable, Element: ApiComparable 
             guard let otherElement = other.first(where: { identitiesMatch($0, element) }) ?? (offset < other.count ? other[offset] : nil) else {
                 return .removed(elementDescription)
             }
-            return element.compare(to: otherElement, in: "item at idx \(offset) - " + elementDescription)
+            return element.compare(to: otherElement, in: "\(ordinalStr(offset)) item - " + elementDescription)
             } + other
                 .filter { element in !self.contains { identitiesMatch($0, element) || $0 == element } }
                 .map { .added(String(forContext: $0)) }

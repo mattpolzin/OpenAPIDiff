@@ -50,19 +50,21 @@ public struct ApiDiff: CustomStringConvertible, Equatable, Comparable {
     }
 
     public enum Diff: Equatable, Comparable {
-        case removed
         case same
-        indirect case changed([ApiDiff])
+        case removed
         case added
+        indirect case changed([ApiDiff])
 
         public static func < (lhs: Self, rhs: Self) -> Bool {
             switch (lhs, rhs) {
-            case (.removed, .same), (.removed, .changed), (.removed, .added):
+            case (.same, .removed), (.same, .added), (.same, .changed):
                 return true
-            case (.same, .changed), (.same, .added):
+            case (.removed, .added), (.removed, .changed):
                 return true
-            case (.changed, .added):
+            case (.added, .changed):
                 return true
+            case (.changed(let diffs1), .changed(let diffs2)):
+                return diffs1.lexicographicallyPrecedes(diffs2)
             default:
                 return false
             }
@@ -100,5 +102,61 @@ public struct ApiDiff: CustomStringConvertible, Equatable, Comparable {
         return lhs.diff == rhs.diff && lhs.context != nil && rhs.context != nil
             ? lhs.context! < rhs.context!
             : lhs.diff < rhs.diff
+    }
+}
+
+// MARK: - Markdown
+extension ApiDiff {
+    public func markdownDescription(drillingDownWhere diffFilter: (ApiDiff) -> Bool = { _ in true }) -> String {
+        return markdownDescription(drillingDownWhere: diffFilter, depth: 1)
+    }
+
+    private func nestedNode(_ diffs: [ApiDiff], drillingDownWhere diffFilter: (ApiDiff) -> Bool, depth: Int) -> String {
+        let headerPrefix = "\n" + String(repeating: "#", count: depth)
+        let contextString = context.map { " \($0)" } ?? ""
+
+        let nestedDiff = diffs.count == 0
+            ? ""
+            : "\n" + diffs.map { diff in
+                diff.markdownDescription(drillingDownWhere: diffFilter, depth: depth + 1)
+            }.joined(separator: "\n")
+
+        return headerPrefix + " Changes to\(contextString)" + nestedDiff
+    }
+
+    /// Takes a nested diff array that is shallow and one dimensional enough and flattens it.
+    /// Otherwise, it leaves it nested.
+    private func flattenedLeafNode(_ apiDiff: ApiDiff, drillingDownWhere diffFilter: (ApiDiff) -> Bool, depth: Int) -> String {
+        let diff = apiDiff.diff
+        guard
+            case .changed(let changes) = diff,
+            changes.isEmpty,
+            let changeDescription = apiDiff.context,
+            let context = self.context
+        else {
+            return nestedNode([apiDiff], drillingDownWhere: diffFilter, depth: depth)
+        }
+        return "- Updated `\(context)` \(changeDescription)"
+    }
+
+    private func markdownDescription(drillingDownWhere diffFilter: (ApiDiff) -> Bool, depth: Int) -> String {
+
+        let contextString = context.map { " \($0)" } ?? ""
+        switch diff {
+        case .same:
+            return "- No Difference to\(contextString)"
+        case .added:
+            return "- Added\(contextString)"
+        case .removed:
+            return "- Removed\(contextString)"
+        case .changed(let diffs):
+            let filteredDiffs = diffs.filter(diffFilter)
+
+            if filteredDiffs.count == 1, let diff = filteredDiffs.first {
+                return flattenedLeafNode(diff, drillingDownWhere: diffFilter, depth: depth)
+            } else {
+                return nestedNode(filteredDiffs, drillingDownWhere: diffFilter, depth: depth)
+            }
+        }
     }
 }
