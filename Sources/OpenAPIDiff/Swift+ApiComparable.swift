@@ -26,10 +26,7 @@ extension String: ApiComparable {
     public func compare(to other: String, in context: String? = nil) -> ApiDiff {
         guard self != other else { return .same(context) }
 
-        return .init(
-            context: context,
-            changes: [.changed("from '\(self)' to '\(other)'", diff: [])]
-        )
+        return .changed(context: context, from: String(describing: self), to: String(describing: other))
     }
 }
 
@@ -37,10 +34,7 @@ extension URL: ApiComparable {
     public func compare(to other: URL, in context: String? = nil) -> ApiDiff {
         guard self != other else { return .same(context) }
 
-        return .init(
-            context: context,
-            changes: [.changed("from '\(self.absoluteString)' to '\(other.absoluteString)'", diff: [])]
-        )
+        return .changed(context: context, from: self.absoluteString, to: other.absoluteString)
     }
 }
 
@@ -48,10 +42,7 @@ extension Bool: ApiComparable {
     public func compare(to other: Bool, in context: String? = nil) -> ApiDiff {
         guard self != other else { return .same(context) }
 
-        return .init(
-            context: context,
-            changes: [.changed("from \(self) to \(other)", diff: [])]
-        )
+        return .changed(context: context, from: String(describing: self), to: String(describing: other))
     }
 }
 
@@ -77,13 +68,26 @@ extension Array: ApiComparable where Element: Equatable, Element: ApiComparable 
     public func compare(to other: Self, in context: String? = nil) -> ApiDiff {
         let changes: [ApiDiff] = self.enumerated().map { (offset, element) in
             let elementDescription = (element as? ApiContext)?.apiContext ?? String(describing: element)
-            guard let otherElement = other.first(where: { identitiesMatch($0, element) }) ?? (offset < other.count ? other[offset] : nil) else {
+
+            func candidate() -> Element? {
+                if Element.self is Identifiable.Type {
+                    return other.first { identitiesMatch($0, element) }
+                }
+                return offset < other.count ? other[offset] : nil
+            }
+
+            guard let otherElement = candidate() else {
                 return .removed(elementDescription)
             }
-            return element.compare(to: otherElement, in: "\(ordinalStr(offset)) item - " + elementDescription)
-            } + other
-                .filter { element in !self.contains { identitiesMatch($0, element) || $0 == element } }
-                .map { .added(String(forContext: $0)) }
+
+            let comparisonContext = Element.self is Identifiable.Type
+                ? elementDescription
+                : "\(ordinalStr(offset)) item - " + elementDescription
+
+            return element.compare(to: otherElement, in: comparisonContext)
+        } + other
+            .filter { element in !self.contains { identitiesMatch($0, element) || $0 == element } }
+            .map { .added(String(forContext: $0)) }
 
         return .init(context: context, changes: changes)
     }

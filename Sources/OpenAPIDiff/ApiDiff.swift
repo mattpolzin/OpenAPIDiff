@@ -32,19 +32,11 @@ public struct ApiDiff: CustomStringConvertible, Equatable, Comparable {
         }
     }
 
-    public static let same: Self = .init(context: nil, diff: .same)
-    public static func same(_ context: String? = nil) -> Self { .init(context: context, diff: .same) }
-    public static let added: Self = .init(context: nil, diff: .added)
-    public static func added(_ context: String? = nil) -> Self { .init(context: context, diff: .added) }
-    public static let removed: Self = .init(context: nil, diff: .removed)
-    public static func removed(_ context: String? = nil) -> Self { .init(context: context, diff: .removed) }
-    public static func changed(_ context: String? = nil, diff: [ApiDiff]) -> Self { .init(context: context, diff: .changed(diff)) }
-
     public var isSame: Bool {
         switch diff {
         case .same:
             return true
-        case .removed, .changed, .added:
+        case .removed, .added, .updated, .changed:
             return false
         }
     }
@@ -53,15 +45,18 @@ public struct ApiDiff: CustomStringConvertible, Equatable, Comparable {
         case same
         case removed
         case added
+        case updated(from: String, to: String)
         indirect case changed([ApiDiff])
 
         public static func < (lhs: Self, rhs: Self) -> Bool {
             switch (lhs, rhs) {
-            case (.same, .removed), (.same, .added), (.same, .changed):
+            case (.same, .removed), (.same, .added), (.same, .updated), (.same, .changed(_)):
                 return true
-            case (.removed, .added), (.removed, .changed):
+            case (.removed, .added), (.removed, .updated), (.removed, .changed):
                 return true
-            case (.added, .changed):
+            case (.added, .changed), (.added, .updated):
+                return true
+            case (.updated, .changed):
                 return true
             case (.changed(let diffs1), .changed(let diffs2)):
                 return diffs1.lexicographicallyPrecedes(diffs2)
@@ -84,6 +79,8 @@ public struct ApiDiff: CustomStringConvertible, Equatable, Comparable {
             return "Added\(contextString)"
         case .removed:
             return "Removed\(contextString)"
+        case .updated(from: let old, to: let new):
+            return "Updated from '\(old)' to '\(new)'"
         case .changed(let diffs):
             let filteredDiffs = diffs.filter(diffFilter)
             let nestedDiff = filteredDiffs.count == 0
@@ -103,6 +100,25 @@ public struct ApiDiff: CustomStringConvertible, Equatable, Comparable {
             ? lhs.context! < rhs.context!
             : lhs.diff < rhs.diff
     }
+}
+
+// MARK: - Convenience
+extension ApiDiff {
+    public static let same: Self = .init(context: nil, diff: .same)
+
+    public static func same(_ context: String? = nil) -> Self { .init(context: context, diff: .same) }
+
+    public static let added: Self = .init(context: nil, diff: .added)
+
+    public static func added(_ context: String? = nil) -> Self { .init(context: context, diff: .added) }
+
+    public static let removed: Self = .init(context: nil, diff: .removed)
+
+    public static func removed(_ context: String? = nil) -> Self { .init(context: context, diff: .removed) }
+
+    public static func changed(context: String?, from: String, to: String) -> Self { .init(context: context, diff: .updated(from: from, to: to)) }
+
+    public static func changed(_ context: String? = nil, diff: [ApiDiff]) -> Self { .init(context: context, diff: .changed(diff)) }
 }
 
 // MARK: - Markdown
@@ -149,6 +165,13 @@ extension ApiDiff {
             return "- Added\(contextString)"
         case .removed:
             return "- Removed\(contextString)"
+        case .updated(from: let old, to: let new):
+            let contextString = context.map { " `\($0)`" } ?? ""
+            return "- Updated\(contextString)"
+                + "\n from"
+                + "\n > " + old.replacingOccurrences(of: "\n", with: "\n > ")
+                + "\n\n to"
+                + "\n > " + new.replacingOccurrences(of: "\n", with: "\n > ")
         case .changed(let diffs):
             let filteredDiffs = diffs.filter(diffFilter)
 

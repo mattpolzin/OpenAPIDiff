@@ -37,4 +37,7 @@ if left.pathExtension.lowercased() == "json" {
     api2 = try! YAMLDecoder().decode(OpenAPI.Document.self, from: file2)
 }
 
-print(api1.compare(to: api2).markdownDescription(drillingDownWhere: { !$0.isSame }))
+print(
+    api1.compare(to: api2)
+        .markdownDescription { !$0.isSame }
+)
