@@ -10,15 +10,25 @@ import OpenAPIKit
 import OpenAPIDiff
 import Yams
 
+var args = CommandLine.arguments.dropFirst()
+
+let printMarkdown: Bool
+if args.contains("--markdown") {
+    printMarkdown = true
+    args.removeAll { $0 == "--markdown" }
+} else {
+    printMarkdown = false
+}
+
 // MARK - Entrypoint
-if CommandLine.arguments.count < 3 {
+if args.count < 2 {
     print("Exactly two arguments are required. Both must be valid file paths to OpenAPI files in either YAML or JSON format.")
 
     exit(1)
 }
 
-let left = URL(fileURLWithPath: CommandLine.arguments[1])
-let right = URL(fileURLWithPath: CommandLine.arguments[2])
+let left = URL(fileURLWithPath: args.removeFirst())
+let right = URL(fileURLWithPath: args.removeFirst())
 
 let api1: OpenAPI.Document
 let api2: OpenAPI.Document
@@ -37,7 +47,10 @@ if left.pathExtension.lowercased() == "json" {
     api2 = try! YAMLDecoder().decode(OpenAPI.Document.self, from: file2)
 }
 
+// Just print the differences to stdout
+let comparison = api1.compare(to: api2)
 print(
-    api1.compare(to: api2)
-        .markdownDescription { !$0.isSame }
+    printMarkdown
+        ? comparison.markdownDescription { !$0.isSame }
+        : comparison.description { !$0.isSame }
 )

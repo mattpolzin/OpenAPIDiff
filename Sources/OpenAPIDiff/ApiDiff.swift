@@ -80,7 +80,7 @@ public struct ApiDiff: CustomStringConvertible, Equatable, Comparable {
         case .removed:
             return "Removed\(contextString)"
         case .updated(from: let old, to: let new):
-            return "Updated from '\(old)' to '\(new)'"
+            return "Updated\(contextString) from '\(old)' to '\(new)'"
         case .changed(let diffs):
             let filteredDiffs = diffs.filter(diffFilter)
             let nestedDiff = filteredDiffs.count == 0
