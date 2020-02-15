@@ -142,7 +142,7 @@ extension OpenAPI.Document: ApiComparable {
     public func compare(to other: OpenAPI.Document, in context: String? = nil) -> ApiDiff {
         // TODO: finish differ
         return .init(
-            context: context ?? "Document",
+            context: context ?? apiContext,
             changes: [
                 openAPIVersion.compare(to: other.openAPIVersion, in: "OpenAPI Spec Version"),
                 info.compare(to: other.info, in: "info"),
@@ -170,6 +170,10 @@ extension OpenAPI.PathItem.Parameter: ApiContext {
 
 extension OpenAPI.HttpVerb: ApiContext {
     public var apiContext: String { "`\(rawValue)`" }
+}
+
+extension OpenAPI.Document: ApiContext {
+    public var apiContext: String { info.title }
 }
 
 extension JSONReference: ApiContext {
