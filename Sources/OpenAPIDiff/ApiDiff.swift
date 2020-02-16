@@ -128,7 +128,11 @@ extension ApiDiff {
 
 // MARK: - Markdown
 extension ApiDiff {
-    public func markdownDescription(drillingDownWhere diffFilter: (ApiDiff) -> Bool = { _ in true }) -> String {
+    public var markdownDescription: String {
+        return markdownDescription(drillingDownWhere: { _ in true })
+    }
+
+    public func markdownDescription(drillingDownWhere diffFilter: (ApiDiff) -> Bool) -> String {
         return markdownDescription(drillingDownWhere: diffFilter, depth: 1)
     }
 
