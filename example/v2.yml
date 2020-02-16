@@ -1,0 +1,95 @@
+openapi: 3.0.0
+info:
+  title: OpenAPI Example API
+  description: '## Descriptive Text
+
+    Now with a _more descriptive_ description than before!'
+  version: 2.0
+servers:
+- url: http://localhost
+- url: https://remote.host.com
+paths:
+  /docs/openapi.yml:
+    get:
+      tags:
+      - Documentation
+      summary: Download API Documentation
+      description: Retrieve the OpenAPI documentation as a YAML file.
+      responses:
+        200:
+          description: OK
+          content:
+            application/x-yaml:
+              schema:
+                type: string
+  /docs:
+    get:
+      tags:
+      - Documentation
+      summary: View API Documentation
+      description: API Documentation is served using the Redoc web app.
+      responses:
+        200:
+          description: OK
+          content:
+            text/html:
+              schema:
+                type: string
+  /healthcheck:
+    get:
+      tags:
+      - Infra
+      summary: Check that the server is healthy
+      description: This endpoint guarantees a success return if the server is operational.
+      responses:
+        200:
+          description: Healthy
+  /hello:
+    get:
+      tags:
+      - Greetings
+      summary: View a greeting
+      description: Say hello in one of the supported languages!
+      parameters:
+      - name: language
+        in: query
+        schema:
+          type: string
+          enum:
+          - english
+          - spanish
+          - french
+          - german
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  language:
+                    type: string
+                    enum:
+                    - english
+                    - spanish
+                    - french
+                    - german
+                  greeting:
+                    type: string
+                required:
+                - greeting
+                - language
+        400:
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                type: string
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}

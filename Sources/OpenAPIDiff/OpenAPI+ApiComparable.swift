@@ -66,8 +66,8 @@ extension JSONSchema: ApiComparable {
                         unchangedCount += 1
                     } else {
                         if unchangedCount >= 5 {
-                            orig.removeSubrange(idx.advanced(by: 1)..<orig.index(idx, offsetBy: unchangedCount - 1))
-                            orig.insert("  [...]", at: idx.advanced(by: 2))
+                            orig.removeSubrange(orig.index(after: idx)...orig.index(idx, offsetBy: unchangedCount - 1))
+                            orig.insert("  [...]", at: orig.index(idx, offsetBy: 1))
                         }
 
                         unchangedCount = 0
@@ -142,6 +142,32 @@ extension OpenAPI.PathItem.Parameter: ApiComparable, Identifiable {
     public var id: String { name }
 }
 
+extension OpenAPI.Response: ApiComparable {
+    public func compare(to other: OpenAPI.Response, in context: String?) -> ApiDiff {
+        return .init(
+            context: context,
+            changes: [
+                description.compare(to: other.description, in: "description"),
+//                headers.compare(to: other.headers, in: "headers"),
+                content.compare(to: other.content, in: "content")
+            ]
+        )
+    }
+}
+
+extension OpenAPI.Request: ApiComparable {
+    public func compare(to other: OpenAPI.Request, in context: String?) -> ApiDiff {
+        return .init(
+            context: context,
+            changes: [
+                description.compare(to: other.description, in: "description"),
+                content.compare(to: other.content, in: "content"),
+                required.compare(to: other.required, in: "required")
+            ]
+        )
+    }
+}
+
 extension OpenAPI.PathItem.Operation: ApiComparable {
     public func compare(to other: OpenAPI.PathItem.Operation, in context: String? = nil) -> ApiDiff {
         // TODO: finish writing differ
@@ -154,8 +180,8 @@ extension OpenAPI.PathItem.Operation: ApiComparable {
                 externalDocs.compare(to: other.externalDocs, in: "external docs"),
                 operationId.compare(to: other.operationId, in: "operation ID"),
                 parameters.compare(to: other.parameters, in: "parameters"),
-                // requestBody.compare(to: other.requestBody, in: "request body"),
-                // responses.compare(to: other.responses, in: "responses"),
+                requestBody.compare(to: other.requestBody, in: "request body"),
+                responses.compare(to: other.responses, in: "responses"),
                 deprecated.compare(to: other.deprecated, in: "deprecated"),
                 // security.compare(to: other.security, in: "security"),
                 servers.compare(to: other.servers, in: "servers")
@@ -325,8 +351,20 @@ extension OpenAPI.PathItem.Parameter.Location: ApiContext {
     }
 }
 
+extension OpenAPI.Server: ApiContext {
+    public var apiContext: String { url.absoluteString }
+}
+
 extension OpenAPI.HttpVerb: ApiContext {
     public var apiContext: String { "`\(rawValue)`" }
+}
+
+extension OpenAPI.Response.StatusCode: ApiContext {
+    public var apiContext: String { "status code \(rawValue)" }
+}
+
+extension OpenAPI.ContentType: ApiContext {
+    public var apiContext: String { rawValue }
 }
 
 extension OpenAPI.Document: ApiContext {

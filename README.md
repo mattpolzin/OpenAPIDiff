@@ -3,7 +3,7 @@
 This is a WIP diffing library for OpenAPI documentation. It produces a hierarchical list of changes between two versions of an API. Only OpenAPI v3.x is supported.
 
 ## Example
-To see an example of what this library produces when run against two JSON OpenAPI documents with the markdown option, take a look at the `example` folder.
+To see an example of what this library produces when run against two YAML OpenAPI documents with the markdown option, take a look at the `example` folder.
 
 ## Usage
 ### Executable
