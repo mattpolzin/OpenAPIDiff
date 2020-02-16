@@ -18,7 +18,7 @@ let package = Package(
     targets: [
         .target(
             name: "OpenAPIDiff",
-            dependencies: ["OpenAPIKit", "OrderedDictionary", "Poly"]),
+            dependencies: ["OpenAPIKit", "OrderedDictionary", "Poly", "Yams"]),
         .testTarget(
             name: "OpenAPIDiffTests",
             dependencies: ["OpenAPIDiff"]),

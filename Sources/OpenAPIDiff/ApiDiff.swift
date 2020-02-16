@@ -36,7 +36,7 @@ public struct ApiDiff: CustomStringConvertible, Equatable, Comparable {
         switch diff {
         case .same:
             return true
-        case .removed, .added, .updated, .changed:
+        case .removed, .added, .updated, .interleaved, .changed:
             return false
         }
     }
@@ -46,17 +46,20 @@ public struct ApiDiff: CustomStringConvertible, Equatable, Comparable {
         case removed
         case added
         case updated(from: String, to: String)
+        case interleaved(diff: String)
         indirect case changed([ApiDiff])
 
         public static func < (lhs: Self, rhs: Self) -> Bool {
             switch (lhs, rhs) {
-            case (.same, .removed), (.same, .added), (.same, .updated), (.same, .changed(_)):
+            case (.same, .removed), (.same, .added), (.same, .updated), (.same, .interleaved), (.same, .changed(_)):
                 return true
-            case (.removed, .added), (.removed, .updated), (.removed, .changed):
+            case (.removed, .added), (.removed, .updated), (.removed, .interleaved), (.removed, .changed):
                 return true
-            case (.added, .changed), (.added, .updated):
+            case (.added, .updated), (.added, .interleaved), (.added, .changed):
                 return true
-            case (.updated, .changed):
+            case (.updated, .interleaved), (.updated, .changed):
+                return true
+            case (.interleaved, .changed):
                 return true
             case (.changed(let diffs1), .changed(let diffs2)):
                 return diffs1.lexicographicallyPrecedes(diffs2)
@@ -81,6 +84,8 @@ public struct ApiDiff: CustomStringConvertible, Equatable, Comparable {
             return "Removed\(contextString)"
         case .updated(from: let old, to: let new):
             return "Updated\(contextString) from '\(old)' to '\(new)'"
+        case .interleaved(diff: let diffString):
+            return "Changed\(contextString) \n" + diffString
         case .changed(let diffs):
             let filteredDiffs = diffs.filter(diffFilter)
             let nestedDiff = filteredDiffs.count == 0
@@ -146,13 +151,16 @@ extension ApiDiff {
         let diff = apiDiff.diff
         guard
             case .changed(let changes) = diff,
-            changes.isEmpty,
-            let changeDescription = apiDiff.context,
+            changes.filter(diffFilter).count == 1,
+            let childChange = changes.filter(diffFilter).first,
+            let childContext = apiDiff.context,
             let context = self.context
         else {
             return nestedNode([apiDiff], drillingDownWhere: diffFilter, depth: depth)
         }
-        return "- Updated `\(context)` \(changeDescription)"
+        let headerPrefix = "\n" + String(repeating: "#", count: depth)
+        return headerPrefix + " Changes to \(context) -> \(childContext)" + "\n"
+            + childChange.markdownDescription(drillingDownWhere: diffFilter, depth: depth + 1)
     }
 
     private func markdownDescription(drillingDownWhere diffFilter: (ApiDiff) -> Bool, depth: Int) -> String {
@@ -167,11 +175,16 @@ extension ApiDiff {
             return "- Removed\(contextString)"
         case .updated(from: let old, to: let new):
             let contextString = context.map { " `\($0)`" } ?? ""
-            return "- Updated\(contextString)"
-                + "\n from"
+            return "- Updated\(contextString) from"
                 + "\n > " + old.replacingOccurrences(of: "\n", with: "\n > ")
-                + "\n\n to"
+                + "\n\n- to"
                 + "\n > " + new.replacingOccurrences(of: "\n", with: "\n > ")
+        case .interleaved(diff: let diffString):
+            let contextString = context.map { " `\($0)`" } ?? ""
+            return "- Updated\(contextString) "
+                + "\n\n```diff\n"
+                + diffString
+                + "\n```\n\n"
         case .changed(let diffs):
             let filteredDiffs = diffs.filter(diffFilter)
 

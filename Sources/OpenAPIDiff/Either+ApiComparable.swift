@@ -7,7 +7,7 @@
 
 import Poly
 
-extension Either: ApiComparable where A: ApiComparable, A: ApiContext, B: ApiComparable, B: ApiContext {
+extension Either: ApiComparable where A: ApiComparable, B: ApiComparable {
     public func compare(to other: Self, in context: String? = nil) -> ApiDiff {
         switch (self, other) {
         case (.a(let left), .a(let right)):
@@ -16,9 +16,22 @@ extension Either: ApiComparable where A: ApiComparable, A: ApiContext, B: ApiCom
             return left.compare(to: right, in: context)
         case (.a(let left as ApiContext), .b(let right as ApiContext)),
              (.b(let left as ApiContext), .a(let right as ApiContext)):
-            return .init(
+            return .changed(
                 context: context,
-                changes: [.changed("from '\(String(forContext: left))' to '\(String(forContext: right))'", diff: [])]
+                from: String(forContext: left),
+                to: String(forContext: right)
+            )
+        case (.a(let left), .b(let right)):
+            return .changed(
+                context: context,
+                from: String(describing: left),
+                to: String(describing: right)
+            )
+        case (.b(let left), .a(let right)):
+            return .changed(
+                context: context,
+                from: String(describing: left),
+                to: String(describing: right)
             )
         }
     }
