@@ -57,6 +57,26 @@ extension JSONSchema: ApiComparable {
                 }
             }
 
+            // truncate large sections without change
+            if var idx = orig.indices.last,
+                let firstIdx = orig.indices.first {
+                var unchangedCount = 0
+                while idx >= firstIdx {
+                    if orig[idx].starts(with: "  ") && idx > firstIdx {
+                        unchangedCount += 1
+                    } else {
+                        if unchangedCount >= 5 {
+                            orig.removeSubrange(idx.advanced(by: 1)..<orig.index(idx, offsetBy: unchangedCount - 1))
+                            orig.insert("  [...]", at: idx.advanced(by: 2))
+                        }
+
+                        unchangedCount = 0
+                    }
+
+                    idx = orig.index(before: idx)
+                }
+            }
+
             return .init(context: context, diff: .interleaved(diff: orig.joined(separator: "\n")))
         }
 

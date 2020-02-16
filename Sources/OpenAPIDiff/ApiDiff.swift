@@ -184,7 +184,7 @@ extension ApiDiff {
             return "- Updated\(contextString) "
                 + "\n\n```diff\n"
                 + diffString
-                + "\n```\n\n"
+                + "\n```\n"
         case .changed(let diffs):
             let filteredDiffs = diffs.filter(diffFilter)
 
