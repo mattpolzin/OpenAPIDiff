@@ -147,7 +147,7 @@ extension ApiDiff {
 
     /// Takes a nested diff array that is shallow and one dimensional enough and flattens it.
     /// Otherwise, it leaves it nested.
-    private func flattenedLeafNode(_ apiDiff: ApiDiff, drillingDownWhere diffFilter: (ApiDiff) -> Bool, depth: Int) -> String {
+    private func flattenedDiff(_ apiDiff: ApiDiff, drillingDownWhere diffFilter: (ApiDiff) -> Bool, depth: Int) -> String {
         let diff = apiDiff.diff
         guard
             case .changed(let changes) = diff,
@@ -189,7 +189,7 @@ extension ApiDiff {
             let filteredDiffs = diffs.filter(diffFilter)
 
             if filteredDiffs.count == 1, let diff = filteredDiffs.first {
-                return flattenedLeafNode(diff, drillingDownWhere: diffFilter, depth: depth)
+                return flattenedDiff(diff, drillingDownWhere: diffFilter, depth: depth)
             } else {
                 return nestedNode(filteredDiffs, drillingDownWhere: diffFilter, depth: depth)
             }
