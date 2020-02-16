@@ -46,7 +46,7 @@ let plaintextDiff = comparison.description
 ```
 
 By default you will be getting entries for all of the things that have _not_ changed as well as those that have changed. You can easily omit the similarities with
-```
+```swift
 let differences = comparison.description { !$0.isSame }
 let markdownDifferences = comparison.markdownDescription { !$0.isSame }
 ```
