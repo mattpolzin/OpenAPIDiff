@@ -8,9 +8,9 @@
 
 #### Changes to GET endpoint
 
-##### Changes to responses -> status code 200
+##### Changes to responses → status code 200
 
-###### Changes to content -> application/json
+###### Changes to content → application/json
 - Updated `schema`
 
 ```diff
@@ -28,7 +28,7 @@
 ```
 
 
-##### Changes to parameters -> `language`
+##### Changes to parameters → `language`
 
 ###### Changes to schema or content
 - Updated `schema`

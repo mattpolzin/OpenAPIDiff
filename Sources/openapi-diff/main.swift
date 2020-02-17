@@ -20,6 +20,14 @@ if args.contains("--markdown") {
     printMarkdown = false
 }
 
+let printSchemaDiffs: Bool
+if args.contains("--skip-schemas") {
+    printSchemaDiffs = false
+    args.removeAll { $0 == "--skip-schemas" }
+} else {
+    printSchemaDiffs = true
+}
+
 // MARK - Entrypoint
 if args.count < 2 {
     print("Exactly two arguments are required. Both must be valid file paths to OpenAPI files in either YAML or JSON format.")
@@ -47,10 +55,19 @@ if left.pathExtension.lowercased() == "json" {
     api2 = try! YAMLDecoder().decode(OpenAPI.Document.self, from: file2)
 }
 
+let filter: (ApiDiff) -> Bool = { apiDiff in
+    let filters: [(ApiDiff) -> Bool] = [
+        { !$0.isSame },
+        printSchemaDiffs ? nil : { $0.context != "schema" }
+        ].compactMap { $0 }
+
+    return filters.allSatisfy { $0(apiDiff) }
+}
+
 // Just print the differences to stdout
 let comparison = api1.compare(to: api2)
 print(
     printMarkdown
-        ? comparison.markdownDescription { !$0.isSame }
-        : comparison.description { !$0.isSame }
+        ? comparison.markdownDescription(drillingDownWhere: filter)
+        : comparison.description(drillingDownWhere: filter)
 )
