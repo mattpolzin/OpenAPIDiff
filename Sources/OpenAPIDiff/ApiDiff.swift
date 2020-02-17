@@ -198,7 +198,7 @@ extension ApiDiff {
             return "- Updated\(contextString) "
                 + "\n\t- from"
                 + "\n > " + old.replacingOccurrences(of: "\n", with: "\n > ")
-                + "\n\t- to"
+                + "\n\n\t- to"
                 + "\n > " + new.replacingOccurrences(of: "\n", with: "\n > ")
                 + "\n"
         case .interleaved(diff: let diffString):

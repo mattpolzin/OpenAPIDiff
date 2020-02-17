@@ -19,9 +19,9 @@
 +     - german
       type: string
   required:
-- - greeting
-  - language
-+ - greeting
+- - language
+  - greeting
++ - language
   type: object
 ```
 
@@ -47,6 +47,7 @@
 	- from
  > ## Descriptive Text
  > This text supports _markdown_!
+
 	- to
  > ## Descriptive Text
  > Now with a _more descriptive_ description than before!
@@ -54,5 +55,6 @@
 - Updated **API version**
 	- from
  > 1.0
+
 	- to
  > 2.0
