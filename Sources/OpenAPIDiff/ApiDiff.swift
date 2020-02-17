@@ -132,7 +132,7 @@ extension ApiDiff {
         return markdownDescription(drillingDownWhere: { _ in true })
     }
 
-    public func markdownDescription(drillingDownWhere diffFilter: (ApiDiff) -> Bool, attemptFlatteningPast flattenDepth: Int = 3) -> String {
+    public func markdownDescription(drillingDownWhere diffFilter: (ApiDiff) -> Bool, attemptFlatteningPast flattenDepth: Int = 4) -> String {
         return markdownDescription(drillingDownWhere: diffFilter, depth: 1, attemptFlatteningPast: flattenDepth)
     }
 

@@ -19,9 +19,9 @@
 +     - german
       type: string
   required:
-- - greeting
-  - language
-+ - greeting
+- - language
+  - greeting
++ - language
   type: object
 ```
 
