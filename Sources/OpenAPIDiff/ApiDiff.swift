@@ -152,22 +152,35 @@ extension ApiDiff {
     /// Takes a nested diff array that is shallow and one dimensional enough and flattens it.
     /// Otherwise, it leaves it nested.
     private func flattenedDiff(_ apiDiff: ApiDiff, drillingDownWhere diffFilter: (ApiDiff) -> Bool, depth: Int) -> String {
-        let diff = apiDiff.diff
-        guard
-            case .changed(let changes) = diff,
-            changes.filter(diffFilter).count <= 1,
-            let childContext = apiDiff.context,
-            let context = self.context
-        else {
+
+        guard let rootContext = context else {
             return nestedNode([apiDiff], drillingDownWhere: diffFilter, depth: depth)
         }
-        if let childChange = changes.filter(diffFilter).first {
-            let headerPrefix = "\n" + String(repeating: "#", count: depth)
-            return headerPrefix + " Changes to \(context) → \(childContext)" + "\n"
-                + childChange.markdownDescription(drillingDownWhere: diffFilter, depth: depth + 1)
-        } else {
-            return "- Changes to \(context) → \(childContext)"
+
+        func _extendedContext(for apiDiff: ApiDiff, in context: String) -> (String, next: ApiDiff?) {
+            let childContext = apiDiff.context.map { " → \($0)" } ?? ""
+            switch apiDiff.diff {
+            case .changed(let changes) where changes.filter(diffFilter).count <= 1:
+                let filteredChanges = changes.filter(diffFilter)
+                guard let change = filteredChanges.first else {
+                    return (context + childContext, nil)
+                }
+                return _extendedContext(for: change, in: context + childContext)
+
+            default:
+                return (context, apiDiff)
+            }
         }
+
+        let extendedContext = _extendedContext(for: apiDiff, in: rootContext)
+
+        guard let nextDiff = extendedContext.next else {
+            return "- Changes to \(extendedContext.0)"
+        }
+
+        let headerPrefix = "\n" + String(repeating: "#", count: depth)
+        return headerPrefix + " Changes to \(extendedContext.0)" + "\n"
+            + nextDiff.markdownDescription(drillingDownWhere: diffFilter, depth: depth + 1)
     }
 
     private func markdownDescription(drillingDownWhere diffFilter: (ApiDiff) -> Bool, depth: Int) -> String {
@@ -181,13 +194,15 @@ extension ApiDiff {
         case .removed:
             return "- Removed\(contextString)"
         case .updated(from: let old, to: let new):
-            let contextString = context.map { " `\($0)`" } ?? ""
-            return "- Updated\(contextString) from"
+            let contextString = context.map { " **\($0)**" } ?? ""
+            return "- Updated\(contextString) "
+                + "\n\t- from"
                 + "\n > " + old.replacingOccurrences(of: "\n", with: "\n > ")
-                + "\n\n- to"
+                + "\n\t- to"
                 + "\n > " + new.replacingOccurrences(of: "\n", with: "\n > ")
+                + "\n"
         case .interleaved(diff: let diffString):
-            let contextString = context.map { " `\($0)`" } ?? ""
+            let contextString = context.map { " **\($0)**" } ?? ""
             return "- Updated\(contextString) "
                 + "\n\n```diff\n"
                 + diffString
@@ -198,7 +213,7 @@ extension ApiDiff {
             if filteredDiffs.count == 1, let diff = filteredDiffs.first {
                 return flattenedDiff(diff, drillingDownWhere: diffFilter, depth: depth)
             } else if filteredDiffs.count == 0 {
-                let contextString = context.map { " `\($0)`" } ?? ""
+                let contextString = context.map { " **\($0)**" } ?? ""
                 return "- Changes to\(contextString)"
             } else {
                 return nestedNode(filteredDiffs, drillingDownWhere: diffFilter, depth: depth)

@@ -8,10 +8,8 @@
 
 #### Changes to GET endpoint
 
-##### Changes to responses → status code 200
-
-###### Changes to content → application/json
-- Updated `schema`
+##### Changes to responses → status code 200 → content → application/json
+- Updated **schema**
 
 ```diff
   properties:
@@ -21,17 +19,15 @@
 +     - german
       type: string
   required:
-- - language
-  - greeting
-+ - language
+- - greeting
+  - language
++ - greeting
   type: object
 ```
 
 
-##### Changes to parameters → `language`
-
-###### Changes to schema or content
-- Updated `schema`
+##### Changes to parameters → `language` → schema or content
+- Updated **schema**
 
 ```diff
   enum:
@@ -47,15 +43,16 @@
 - Added https://remote.host.com
 
 ## Changes to info
-- Updated `description` from
+- Updated **description**
+	- from
  > ## Descriptive Text
  > This text supports _markdown_!
-
-- to
+	- to
  > ## Descriptive Text
  > Now with a _more descriptive_ description than before!
-- Updated `API version` from
- > 1.0
 
-- to
+- Updated **API version**
+	- from
+ > 1.0
+	- to
  > 2.0
