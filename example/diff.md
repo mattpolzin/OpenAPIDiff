@@ -17,11 +17,7 @@
       - spanish
 +     - french
 +     - german
-      type: string
-  required:
-- - language
-  - greeting
-+ - language
+  [...]
   type: object
 ```
 
@@ -44,17 +40,19 @@
 
 ## Changes to info
 - Updated **description**
-	- from
+
+ _from_ ↯
  > ## Descriptive Text
  > This text supports _markdown_!
 
-	- to
+ _to_ ↯
  > ## Descriptive Text
  > Now with a _more descriptive_ description than before!
 
 - Updated **API version**
-	- from
+
+ _from_ ↯
  > 1.0
 
-	- to
+ _to_ ↯
  > 2.0
