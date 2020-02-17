@@ -36,7 +36,7 @@ public struct ApiDiff: CustomStringConvertible, Equatable, Comparable {
         switch diff {
         case .same:
             return true
-        case .removed, .added, .updated, .interleaved, .changed:
+        case .removed, .added, .genericChanged, .updated, .interleaved, .changed:
             return false
         }
     }
@@ -45,17 +45,20 @@ public struct ApiDiff: CustomStringConvertible, Equatable, Comparable {
         case same
         case removed
         case added
+        case genericChanged // changed with no details provided
         case updated(from: String, to: String)
         case interleaved(diff: String)
         indirect case changed([ApiDiff])
 
         public static func < (lhs: Self, rhs: Self) -> Bool {
             switch (lhs, rhs) {
-            case (.same, .removed), (.same, .added), (.same, .updated), (.same, .interleaved), (.same, .changed(_)):
+            case (.same, .removed), (.same, .added), (.same, .genericChanged), (.same, .updated), (.same, .interleaved), (.same, .changed(_)):
                 return true
-            case (.removed, .added), (.removed, .updated), (.removed, .interleaved), (.removed, .changed):
+            case (.removed, .added), (.removed, .genericChanged), (.removed, .updated), (.removed, .interleaved), (.removed, .changed):
                 return true
-            case (.added, .updated), (.added, .interleaved), (.added, .changed):
+            case (.added, .genericChanged), (.added, .updated), (.added, .interleaved), (.added, .changed):
+                return true
+            case (.genericChanged, .updated), (.genericChanged, .interleaved), (.genericChanged, .changed):
                 return true
             case (.updated, .interleaved), (.updated, .changed):
                 return true
@@ -82,6 +85,8 @@ public struct ApiDiff: CustomStringConvertible, Equatable, Comparable {
             return "Added\(contextString)"
         case .removed:
             return "Removed\(contextString)"
+        case .genericChanged:
+            return "Changed\(contextString)"
         case .updated(from: let old, to: let new):
             return "Updated\(contextString) from '\(old)' to '\(new)'"
         case .interleaved(diff: let diffString):
@@ -151,36 +156,35 @@ extension ApiDiff {
 
     /// Takes a nested diff array that is shallow and one dimensional enough and flattens it.
     /// Otherwise, it leaves it nested.
-    private func flattenedDiff(_ apiDiff: ApiDiff, drillingDownWhere diffFilter: (ApiDiff) -> Bool, depth: Int, flattenDepth: Int) -> String {
+    private static func flattenedDiff(_ apiDiff: ApiDiff, drillingDownWhere diffFilter: (ApiDiff) -> Bool) -> ApiDiff {
 
-        guard let rootContext = context else {
-            return nestedNode([apiDiff], drillingDownWhere: diffFilter, depth: depth, flattenDepth: flattenDepth)
-        }
+        func _extendedContext(for apiDiff: ApiDiff, in context: String? = nil) -> (String, next: Diff?) {
 
-        func _extendedContext(for apiDiff: ApiDiff, in context: String) -> (String, next: ApiDiff?) {
-            let childContext = apiDiff.context.map { " → \($0)" } ?? ""
+            let parentContext = context ?? apiDiff.context ?? ""
+            let childContext = context != nil ? apiDiff.context.map { " → \($0)" } ?? "" : ""
+
             switch apiDiff.diff {
             case .changed(let changes) where changes.filter(diffFilter).count <= 1:
                 let filteredChanges = changes.filter(diffFilter)
                 guard let change = filteredChanges.first else {
-                    return (context + childContext, nil)
+                    return (parentContext + childContext, nil)
                 }
-                return _extendedContext(for: change, in: context + childContext)
+                return _extendedContext(for: change, in: parentContext + childContext)
 
             default:
-                return (context, apiDiff)
+                return (parentContext + childContext, apiDiff.diff)
             }
         }
 
-        let extendedContext = _extendedContext(for: apiDiff, in: rootContext)
+        let extendedContext = _extendedContext(for: apiDiff)
 
+        // If we've flattened all of the way to a leaf node, just return a generic change
         guard let nextDiff = extendedContext.next else {
-            return "- Changes to \(extendedContext.0)"
+            return .init(context: extendedContext.0, diff: .genericChanged)
         }
 
-        let headerPrefix = "\n" + String(repeating: "#", count: depth)
-        return headerPrefix + " Changes to \(extendedContext.0)" + "\n"
-            + nextDiff.markdownDescription(drillingDownWhere: diffFilter, depth: depth + 1, attemptFlatteningPast: flattenDepth)
+        // Otherwise, process nested changes
+        return .init(context: extendedContext.0, diff: nextDiff)
     }
 
     private func markdownDescription(drillingDownWhere diffFilter: (ApiDiff) -> Bool, depth: Int, attemptFlatteningPast flattenDepth: Int) -> String {
@@ -191,6 +195,8 @@ extension ApiDiff {
             return "- No Difference to\(contextString)"
         case .added:
             return "- Added\(contextString)"
+        case .genericChanged:
+            return "- Changed\(contextString)"
         case .removed:
             return "- Removed\(contextString)"
         case .updated(from: let old, to: let new):
@@ -210,14 +216,18 @@ extension ApiDiff {
         case .changed(let diffs):
             let filteredDiffs = diffs.filter(diffFilter)
 
-            if depth >= flattenDepth, filteredDiffs.count == 1, let diff = filteredDiffs.first {
-                return flattenedDiff(diff, drillingDownWhere: diffFilter, depth: depth, flattenDepth: flattenDepth)
-            } else if filteredDiffs.count == 0 {
-                let contextString = context.map { " **\($0)**" } ?? ""
+            guard filteredDiffs.count > 0 else {
                 return "- Changes to\(contextString)"
-            } else {
-                return nestedNode(filteredDiffs, drillingDownWhere: diffFilter, depth: depth, flattenDepth: flattenDepth)
             }
+
+            let flattenedDiffs: [ApiDiff]
+            if depth >= flattenDepth {
+                flattenedDiffs = filteredDiffs.map { Self.flattenedDiff($0, drillingDownWhere: diffFilter) }.sorted()
+            } else {
+                flattenedDiffs = filteredDiffs
+            }
+
+            return nestedNode(flattenedDiffs, drillingDownWhere: diffFilter, depth: depth, flattenDepth: flattenDepth)
         }
     }
 }

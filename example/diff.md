@@ -7,9 +7,7 @@
 ### Changes to **/hello**
 
 #### Changes to GET endpoint
-
-##### Changes to responses → status code 200 → content → application/json
-- Updated **schema**
+- Updated **responses → status code 200 → content → application/json → schema**
 
 ```diff
   properties:
@@ -25,9 +23,7 @@
   type: object
 ```
 
-
-##### Changes to parameters → `language` → schema or content
-- Updated **schema**
+- Updated **parameters → `language` → schema or content → schema**
 
 ```diff
   enum:
