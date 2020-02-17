@@ -132,18 +132,18 @@ extension ApiDiff {
         return markdownDescription(drillingDownWhere: { _ in true })
     }
 
-    public func markdownDescription(drillingDownWhere diffFilter: (ApiDiff) -> Bool) -> String {
-        return markdownDescription(drillingDownWhere: diffFilter, depth: 1)
+    public func markdownDescription(drillingDownWhere diffFilter: (ApiDiff) -> Bool, attemptFlatteningPast flattenDepth: Int = 3) -> String {
+        return markdownDescription(drillingDownWhere: diffFilter, depth: 1, attemptFlatteningPast: flattenDepth)
     }
 
-    private func nestedNode(_ diffs: [ApiDiff], drillingDownWhere diffFilter: (ApiDiff) -> Bool, depth: Int) -> String {
+    private func nestedNode(_ diffs: [ApiDiff], drillingDownWhere diffFilter: (ApiDiff) -> Bool, depth: Int, flattenDepth: Int) -> String {
         let headerPrefix = "\n" + String(repeating: "#", count: depth)
         let contextString = context.map { " \($0)" } ?? ""
 
         let nestedDiff = diffs.count == 0
             ? ""
             : "\n" + diffs.map { diff in
-                diff.markdownDescription(drillingDownWhere: diffFilter, depth: depth + 1)
+                diff.markdownDescription(drillingDownWhere: diffFilter, depth: depth + 1, attemptFlatteningPast: flattenDepth)
             }.joined(separator: "\n")
 
         return headerPrefix + " Changes to\(contextString)" + nestedDiff
@@ -151,10 +151,10 @@ extension ApiDiff {
 
     /// Takes a nested diff array that is shallow and one dimensional enough and flattens it.
     /// Otherwise, it leaves it nested.
-    private func flattenedDiff(_ apiDiff: ApiDiff, drillingDownWhere diffFilter: (ApiDiff) -> Bool, depth: Int) -> String {
+    private func flattenedDiff(_ apiDiff: ApiDiff, drillingDownWhere diffFilter: (ApiDiff) -> Bool, depth: Int, flattenDepth: Int) -> String {
 
         guard let rootContext = context else {
-            return nestedNode([apiDiff], drillingDownWhere: diffFilter, depth: depth)
+            return nestedNode([apiDiff], drillingDownWhere: diffFilter, depth: depth, flattenDepth: flattenDepth)
         }
 
         func _extendedContext(for apiDiff: ApiDiff, in context: String) -> (String, next: ApiDiff?) {
@@ -180,10 +180,10 @@ extension ApiDiff {
 
         let headerPrefix = "\n" + String(repeating: "#", count: depth)
         return headerPrefix + " Changes to \(extendedContext.0)" + "\n"
-            + nextDiff.markdownDescription(drillingDownWhere: diffFilter, depth: depth + 1)
+            + nextDiff.markdownDescription(drillingDownWhere: diffFilter, depth: depth + 1, attemptFlatteningPast: flattenDepth)
     }
 
-    private func markdownDescription(drillingDownWhere diffFilter: (ApiDiff) -> Bool, depth: Int) -> String {
+    private func markdownDescription(drillingDownWhere diffFilter: (ApiDiff) -> Bool, depth: Int, attemptFlatteningPast flattenDepth: Int) -> String {
 
         let contextString = context.map { " \($0)" } ?? ""
         switch diff {
@@ -210,13 +210,13 @@ extension ApiDiff {
         case .changed(let diffs):
             let filteredDiffs = diffs.filter(diffFilter)
 
-            if filteredDiffs.count == 1, let diff = filteredDiffs.first {
-                return flattenedDiff(diff, drillingDownWhere: diffFilter, depth: depth)
+            if depth >= flattenDepth, filteredDiffs.count == 1, let diff = filteredDiffs.first {
+                return flattenedDiff(diff, drillingDownWhere: diffFilter, depth: depth, flattenDepth: flattenDepth)
             } else if filteredDiffs.count == 0 {
                 let contextString = context.map { " **\($0)**" } ?? ""
                 return "- Changes to\(contextString)"
             } else {
-                return nestedNode(filteredDiffs, drillingDownWhere: diffFilter, depth: depth)
+                return nestedNode(filteredDiffs, drillingDownWhere: diffFilter, depth: depth, flattenDepth: flattenDepth)
             }
         }
     }

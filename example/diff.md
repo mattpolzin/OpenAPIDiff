@@ -17,7 +17,11 @@
       - spanish
 +     - french
 +     - german
-  [...]
+      type: string
+  required:
+- - greeting
+  - language
++ - greeting
   type: object
 ```
 
