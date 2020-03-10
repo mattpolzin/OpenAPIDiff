@@ -16,6 +16,8 @@ docker run --rm -v "$(pwd)/old.json:/api/old.json" -v "$(pwd)/new.json:/api/new.
 
 You can pass `mattpolzin2/openapi-diff` the `--markdown` flag in addition to the two API document files to produce a markdown diff instead of the default plaintext diff.
 
+For all options, see the `--help`.
+
 ### Library
 As a library, you first reference this package from your manifest or pull it in via Xcode.
 
