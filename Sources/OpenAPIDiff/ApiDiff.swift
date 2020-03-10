@@ -41,6 +41,41 @@ public struct ApiDiff: CustomStringConvertible, Equatable, Comparable {
         }
     }
 
+    public var additions: Int {
+        switch diff {
+        case .same, .removed, .genericChanged, .updated, .interleaved:
+            return 0
+        case .added:
+            return 1
+        case .changed(let diffs):
+            return diffs.reduce(0, { $0 + $1.additions })
+        }
+    }
+
+    public var removals: Int {
+        switch diff {
+        case .same, .added, .genericChanged, .updated, .interleaved:
+            return 0
+        case .removed:
+            return 1
+        case .changed(let diffs):
+            return diffs.reduce(0, { $0 + $1.removals })
+        }
+    }
+
+    /// Changes, excluding additions and removals, which can be retrieved
+    /// from their own accessors.
+    public var changes: Int {
+        switch diff {
+        case .same, .added, .removed:
+            return 0
+        case .genericChanged, .updated, .interleaved:
+            return 1
+        case .changed(let diffs):
+            return diffs.reduce(0, { $0 + $1.changes })
+        }
+    }
+
     public enum Diff: Equatable, Comparable {
         case same
         case removed

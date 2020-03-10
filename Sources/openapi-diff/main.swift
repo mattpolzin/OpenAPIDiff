@@ -24,16 +24,24 @@ struct OpenAPIDiff: ParsableCommand {
     @Argument()
     var secondFilePath: String
 
+    enum PrintStyle: String, CaseIterable {
+        case plaintext
+        case markdown
+        case stats
+    }
+
     @Flag(
-        name: [.customLong("markdown"), .customShort("m")],
-        help: "Print the diff as a markdown document."
+        name: .shortAndLong,
+        default: .plaintext,
+        help: .init(
+            "Print the diff as nested plaintext, a markdown document, or just print stats.",
+            discussion: "Only plaintext and markdown printouts are affected by the --skip-schemas option. Stats always prints unfiltered numbers."
+        )
     )
-    var printMarkdown: Bool
+    var printStyle: PrintStyle
 
     @Flag(
         name: [.customLong("skip-schemas")],
-        inversion: .prefixedNo,
-        exclusivity: .exclusive,
         help: .init(
             "Don't compare OpenAPI Schema Objects.",
             discussion: "By default, schemas will be diffed. This can produce lengthy diffs and might be distracting from the more salient points of the diff."
@@ -73,11 +81,20 @@ struct OpenAPIDiff: ParsableCommand {
 
         // Just print the differences to stdout
         let comparison = api1.compare(to: api2)
-        print(
-            printMarkdown
-                ? comparison.markdownDescription(drillingDownWhere: filter)
-                : comparison.description(drillingDownWhere: filter)
-        )
+        let description: String
+        switch printStyle {
+        case .plaintext:
+            description = comparison.description(drillingDownWhere: filter)
+        case .markdown:
+            description = comparison.markdownDescription(drillingDownWhere: filter)
+        case .stats:
+            description = """
+    \(comparison.additions) additions.
+    \(comparison.removals) removals.
+    \(comparison.changes) changes.
+"""
+        }
+        print(description)
     }
 }
 
