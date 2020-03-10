@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/mattpolzin/OpenAPIKit.git",
         "state": {
           "branch": null,
-          "revision": "02bf3f48c3678bb93869a10c7867d9a9373971dc",
-          "version": "0.20.0"
+          "revision": "7386355f3c31a4094f528e0f650947ceb90b2cd7",
+          "version": "0.23.0"
         }
       },
       {
@@ -33,8 +33,8 @@
         "repositoryURL": "https://github.com/mattpolzin/OrderedDictionary.git",
         "state": {
           "branch": null,
-          "revision": "0ae556a691ca71e3221ecaf21ce448d3283fdf8b",
-          "version": "1.0.0"
+          "revision": "33a40de47e798d58f42e84e529d087f795f5a9db",
+          "version": "1.1.1"
         }
       },
       {
@@ -56,12 +56,12 @@
         }
       },
       {
-        "package": "Sampleable",
-        "repositoryURL": "https://github.com/mattpolzin/Sampleable.git",
+        "package": "swift-argument-parser",
+        "repositoryURL": "https://github.com/apple/swift-argument-parser.git",
         "state": {
           "branch": null,
-          "revision": "df44bf1a860481109dcf455e3c6daf0a0f1bc259",
-          "version": "2.1.0"
+          "revision": "35b76bf577d3cc74820f8991894ce3bcdf024ddc",
+          "version": "0.0.2"
         }
       },
       {

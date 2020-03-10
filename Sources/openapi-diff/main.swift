@@ -9,65 +9,76 @@ import Foundation
 import OpenAPIKit
 import OpenAPIDiff
 import Yams
+import ArgumentParser
 
-var args = CommandLine.arguments.dropFirst()
+struct OpenAPIDiff: ParsableCommand {
 
-let printMarkdown: Bool
-if args.contains("--markdown") {
-    printMarkdown = true
-    args.removeAll { $0 == "--markdown" }
-} else {
-    printMarkdown = false
+    static let configuration = CommandConfiguration(
+        abstract: "Print the differences between two OpenAPI Documents.",
+        discussion: "By default a custom nested structure is printed to show the differences between the two OpenAPI documents. While this format can be concise and good for quick information, the Markdown file produced when passing the --markdown flag is a better deliverable."
+        )
+
+    @Argument()
+    var firstFilePath: String
+
+    @Argument()
+    var secondFilePath: String
+
+    @Flag(
+        name: [.customLong("markdown"), .customShort("m")],
+        help: "Print the diff as a markdown document."
+    )
+    var printMarkdown: Bool
+
+    @Flag(
+        name: [.customLong("skip-schemas")],
+        inversion: .prefixedNo,
+        exclusivity: .exclusive,
+        help: .init(
+            "Don't compare OpenAPI Schema Objects.",
+            discussion: "By default, schemas will be diffed. This can produce lengthy diffs and might be distracting from the more salient points of the diff."
+        )
+    )
+    var skipSchemaDiffs: Bool
+
+    func run() throws {
+        let left = URL(fileURLWithPath: firstFilePath)
+        let right = URL(fileURLWithPath: secondFilePath)
+
+        let api1: OpenAPI.Document
+        let api2: OpenAPI.Document
+
+        if left.pathExtension.lowercased() == "json" {
+            let file1 = try! Data(contentsOf: left)
+            let file2 = try! Data(contentsOf: right)
+
+            api1 = try! JSONDecoder().decode(OpenAPI.Document.self, from: file1)
+            api2 = try! JSONDecoder().decode(OpenAPI.Document.self, from: file2)
+        } else {
+            let file1 = try! String(contentsOf:  left)
+            let file2 = try! String(contentsOf: right)
+
+            api1 = try! YAMLDecoder().decode(OpenAPI.Document.self, from: file1)
+            api2 = try! YAMLDecoder().decode(OpenAPI.Document.self, from: file2)
+        }
+
+        let filter: (ApiDiff) -> Bool = { apiDiff in
+            let filters: [(ApiDiff) -> Bool] = [
+                { !$0.isSame },
+                self.skipSchemaDiffs ? { $0.context != "schema" } : nil
+            ].compactMap { $0 }
+
+            return filters.allSatisfy { $0(apiDiff) }
+        }
+
+        // Just print the differences to stdout
+        let comparison = api1.compare(to: api2)
+        print(
+            printMarkdown
+                ? comparison.markdownDescription(drillingDownWhere: filter)
+                : comparison.description(drillingDownWhere: filter)
+        )
+    }
 }
 
-let printSchemaDiffs: Bool
-if args.contains("--skip-schemas") {
-    printSchemaDiffs = false
-    args.removeAll { $0 == "--skip-schemas" }
-} else {
-    printSchemaDiffs = true
-}
-
-// MARK - Entrypoint
-if args.count < 2 {
-    print("Exactly two arguments are required. Both must be valid file paths to OpenAPI files in either YAML or JSON format.")
-
-    exit(1)
-}
-
-let left = URL(fileURLWithPath: args.removeFirst())
-let right = URL(fileURLWithPath: args.removeFirst())
-
-let api1: OpenAPI.Document
-let api2: OpenAPI.Document
-
-if left.pathExtension.lowercased() == "json" {
-    let file1 = try! Data(contentsOf: left)
-    let file2 = try! Data(contentsOf: right)
-
-    api1 = try! JSONDecoder().decode(OpenAPI.Document.self, from: file1)
-    api2 = try! JSONDecoder().decode(OpenAPI.Document.self, from: file2)
-} else {
-    let file1 = try! String(contentsOf:  left)
-    let file2 = try! String(contentsOf: right)
-
-    api1 = try! YAMLDecoder().decode(OpenAPI.Document.self, from: file1)
-    api2 = try! YAMLDecoder().decode(OpenAPI.Document.self, from: file2)
-}
-
-let filter: (ApiDiff) -> Bool = { apiDiff in
-    let filters: [(ApiDiff) -> Bool] = [
-        { !$0.isSame },
-        printSchemaDiffs ? nil : { $0.context != "schema" }
-        ].compactMap { $0 }
-
-    return filters.allSatisfy { $0(apiDiff) }
-}
-
-// Just print the differences to stdout
-let comparison = api1.compare(to: api2)
-print(
-    printMarkdown
-        ? comparison.markdownDescription(drillingDownWhere: filter)
-        : comparison.description(drillingDownWhere: filter)
-)
+OpenAPIDiff.main()

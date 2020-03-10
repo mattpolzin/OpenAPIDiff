@@ -10,10 +10,11 @@ let package = Package(
         .executable(name: "openapi-diff", targets: ["openapi-diff"])
     ],
     dependencies: [
-        .package(url: "https://github.com/mattpolzin/OpenAPIKit.git", .upToNextMinor(from: "0.20.0")),
-        .package(url: "https://github.com/mattpolzin/OrderedDictionary.git", .upToNextMajor(from: "1.0.0")),
+        .package(url: "https://github.com/mattpolzin/OpenAPIKit.git", .upToNextMinor(from: "0.23.0")),
+        .package(url: "https://github.com/mattpolzin/OrderedDictionary.git", .upToNextMajor(from: "1.1.1")),
         .package(url: "https://github.com/mattpolzin/Poly.git", .upToNextMajor(from: "2.0.0")),
-        .package(url: "https://github.com/jpsim/Yams.git", .upToNextMajor(from: "2.0.0"))
+        .package(url: "https://github.com/jpsim/Yams.git", .upToNextMajor(from: "2.0.0")),
+        .package(url: "https://github.com/apple/swift-argument-parser.git", .upToNextMinor(from: "0.0.2"))
     ],
     targets: [
         .target(
@@ -24,6 +25,6 @@ let package = Package(
             dependencies: ["OpenAPIDiff"]),
         .target(
             name: "openapi-diff",
-            dependencies: ["OpenAPIDiff", "Yams"])
+            dependencies: ["OpenAPIDiff", "Yams", "ArgumentParser"])
     ]
 )
