@@ -5,7 +5,7 @@
 //  Created by Mathew Polzin on 2/13/20.
 //
 
-import Poly
+import OpenAPIKit
 
 extension Either: ApiComparable where A: ApiComparable, B: ApiComparable {
     public func compare(to other: Self, in context: String? = nil) -> ApiDiff {

@@ -10,10 +10,10 @@ import Yams
 
 extension JSONReference: ApiComparable, Identifiable {
     public func compare(to other: Self, in context: String? = nil) -> ApiDiff {
-        return description.compare(to: other.description, in: context)
+        return absoluteString.compare(to: other.absoluteString, in: context)
     }
 
-    public var id: String { description }
+    public var id: String { absoluteString }
 }
 
 extension JSONSchema: ApiComparable {
@@ -259,8 +259,8 @@ extension OpenAPI.Document.Info: ApiComparable {
     }
 }
 
-extension OpenAPI.ExternalDoc: ApiComparable {
-    public func compare(to other: OpenAPI.ExternalDoc, in context: String?) -> ApiDiff {
+extension OpenAPI.ExternalDocumentation: ApiComparable {
+    public func compare(to other: OpenAPI.ExternalDocumentation, in context: String?) -> ApiDiff {
         return .init(
             context: context,
             changes: [
@@ -330,7 +330,7 @@ extension OpenAPI.Document: ApiComparable {
 }
 
 // MARK: - ApiContext
-extension OpenAPI.PathComponents: ApiContext {
+extension OpenAPI.Path: ApiContext {
     public var apiContext: String { "**\(rawValue)**" }
 }
 
@@ -372,7 +372,7 @@ extension OpenAPI.Document: ApiContext {
 }
 
 extension JSONReference: ApiContext {
-    public var apiContext: String { description }
+    public var apiContext: String { absoluteString }
 }
 
 extension JSONSchema: ApiContext {

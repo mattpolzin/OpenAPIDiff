@@ -5,7 +5,7 @@
 //  Created by Mathew Polzin on 2/13/20.
 //
 
-import OrderedDictionary
+import OpenAPIKit
 
 extension OrderedDictionary: ApiComparable where Value: ApiComparable {
     public func compare(to other: Self, in context: String? = nil) -> ApiDiff {
