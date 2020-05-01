@@ -65,15 +65,21 @@ fileprivate func ordinalStr(_ idx: Int) -> String {
 }
 
 extension Array: ApiComparable where Element: Equatable, Element: ApiComparable {
+
     public func compare(to other: Self, in context: String? = nil) -> ApiDiff {
-        let changes: [ApiDiff] = self.enumerated().map { (offset, element) in
-            let elementDescription = (element as? ApiContext)?.apiContext ?? String(describing: element)
+
+        func element(_ element: Element, in other: Self, atIndex index: Int) -> Element? {
+            if Element.self is Identifiable.Type {
+                return other.first { identitiesMatch($0, element) }
+            }
+            return index < other.count ? other[index] : nil
+        }
+
+        let changes: [ApiDiff] = self.enumerated().map { (offset, currentElement) in
+            let elementDescription = String(describingContext: currentElement)
 
             func candidate() -> Element? {
-                if Element.self is Identifiable.Type {
-                    return other.first { identitiesMatch($0, element) }
-                }
-                return offset < other.count ? other[offset] : nil
+                return element(currentElement, in: other, atIndex: offset)
             }
 
             guard let otherElement = candidate() else {
@@ -82,13 +88,41 @@ extension Array: ApiComparable where Element: Equatable, Element: ApiComparable 
 
             let comparisonContext = Element.self is Identifiable.Type
                 ? elementDescription
-                : "\(ordinalStr(offset)) item - " + elementDescription
+                : "\(ordinalStr(offset)) item\(elementDescription.isEmpty ? "" : " - " + elementDescription)"
 
-            return element.compare(to: otherElement, in: comparisonContext)
+            return currentElement.compare(to: otherElement, in: comparisonContext)
         } + other
-            .filter { element in !self.contains { identitiesMatch($0, element) || $0 == element } }
-            .map { .added(String(forContext: $0)) }
+            .enumerated()
+            .filter { (offset, currentElement) in
+                return element(currentElement, in: self, atIndex: offset) == nil
+            }
+            .map { .added(String(describingContext: $0.element)) }
 
         return .init(context: context, changes: changes)
     }
+}
+
+extension Dictionary: ApiComparable where Value: ApiComparable, Key: ApiContext {
+    public func compare(to other: Self, in context: String? = nil) -> ApiDiff {
+        let changes: [ApiDiff] = self.map { (key, value) in
+            let keyString = String(describingContext: key)
+            guard let otherValue = other[key] else {
+                return .removed(keyString)
+            }
+            return value.compare(to: otherValue, in: keyString)
+        } + other
+            .filter { (key, value) in self[key] == nil }
+            .map { .added(String(describingContext: $0.key)) }
+
+        return .init(
+            context: context,
+            changes: changes
+        )
+    }
+}
+
+// MARK: - ApiContext
+
+extension Dictionary: ApiContext {
+    public var apiContext: String { "" }
 }

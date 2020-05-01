@@ -50,6 +50,8 @@ paths:
       - Greetings
       summary: View a greeting
       description: Say hello in one of the supported languages!
+      security:
+      - hello_secure_2: []
       parameters:
       - name: language
         in: query
@@ -93,3 +95,9 @@ components:
   examples: {}
   requestBodies: {}
   headers: {}
+  securitySchemes:
+    hello_secure_2:
+        type: apiKey
+        description: A key!
+        in: header
+        name: key

@@ -7,52 +7,52 @@
 ### Changes to **/hello**
 
 #### Changes to GET endpoint
-- Updated **responses → status code 200 → content → application/json → schema**
+- Updated **responses → status code 200 → content → application/json → schema** 
 
 ```diff
-  properties:
-  [...]
-      - spanish
+properties:
+[...]
+- spanish
 +     - french
 +     - german
-      type: string
-  required:
-- - language
-  - greeting
-+ - language
-  type: object
+[...]
+type: object
 ```
 
-- Updated **parameters → `language` → schema or content → schema**
+- Updated **parameters → `language` → schema or content → schema** 
 
 ```diff
-  enum:
-  - english
-  - spanish
+enum:
+- english
+- spanish
 + - french
 + - german
-  type: string
+type: string
 ```
 
+
+##### Changes to security → 1st item
+- Removed #/components/securitySchemes/hello_secure_1
+- Added #/components/securitySchemes/hello_secure_2
 
 ## Changes to servers
 - Added https://remote.host.com
 
 ## Changes to info
-- Updated **description**
+- Updated **description** 
 
- _from_ ↯
- > ## Descriptive Text
- > This text supports _markdown_!
+_from_ ↯
+> ## Descriptive Text
+> This text supports _markdown_!
 
- _to_ ↯
- > ## Descriptive Text
- > Now with a _more descriptive_ description than before!
+_to_ ↯
+> ## Descriptive Text
+> Now with a _more descriptive_ description than before!
 
-- Updated **API version**
+- Updated **API version** 
 
- _from_ ↯
- > 1.0
+_from_ ↯
+> 1.0
 
- _to_ ↯
- > 2.0
+_to_ ↯
+> 2.0

@@ -18,8 +18,8 @@ extension Either: ApiComparable where A: ApiComparable, B: ApiComparable {
              (.b(let left as ApiContext), .a(let right as ApiContext)):
             return .changed(
                 context: context,
-                from: String(forContext: left),
-                to: String(forContext: right)
+                from: String(describingContext: left),
+                to: String(describingContext: right)
             )
         case (.a(let left), .b(let right)):
             return .changed(
@@ -52,9 +52,9 @@ extension Either: ApiContext {
     public var apiContext: String {
         switch self {
         case .a(let val):
-            return String(forContext: val)
+            return String(describingContext: val)
         case .b(let val):
-            return String(forContext: val)
+            return String(describingContext: val)
         }
     }
 }

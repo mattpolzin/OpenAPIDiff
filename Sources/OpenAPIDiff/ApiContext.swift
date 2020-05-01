@@ -14,7 +14,7 @@ public protocol ApiContext {
 }
 
 extension String {
-    init(forContext ctx: Any) {
+    init(describingContext ctx: Any) {
         self = (ctx as? ApiContext)?.apiContext ?? String(describing: ctx)
     }
 }
