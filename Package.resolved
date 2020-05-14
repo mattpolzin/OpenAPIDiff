@@ -12,11 +12,11 @@
       },
       {
         "package": "OpenAPIKit",
-        "repositoryURL": "https://github.com/mattpolzin/OpenAPIKit.git",
+        "repositoryURL": "https://github.com/mattpolzin/OpenAPIKit",
         "state": {
           "branch": null,
-          "revision": "84ac940182dcba8a7bc8c73eb4d4a3f108655f4e",
-          "version": "0.30.0"
+          "revision": "732251ae2eb1965c9323ae4f8024df908979b7cf",
+          "version": "1.0.1"
         }
       },
       {
@@ -30,20 +30,20 @@
       },
       {
         "package": "swift-argument-parser",
-        "repositoryURL": "https://github.com/apple/swift-argument-parser.git",
+        "repositoryURL": "https://github.com/apple/swift-argument-parser",
         "state": {
           "branch": null,
-          "revision": "35b76bf577d3cc74820f8991894ce3bcdf024ddc",
-          "version": "0.0.2"
+          "revision": "9f04d1ff1afbccd02279338a2c91e5f27c45e93a",
+          "version": "0.0.5"
         }
       },
       {
         "package": "Yams",
-        "repositoryURL": "https://github.com/jpsim/Yams.git",
+        "repositoryURL": "https://github.com/jpsim/Yams",
         "state": {
           "branch": null,
-          "revision": "c947a306d2e80ecb2c0859047b35c73b8e1ca27f",
-          "version": "2.0.0"
+          "revision": "81a65c4069c28011ee432f2858ba0de49b086677",
+          "version": "3.0.1"
         }
       }
     ]

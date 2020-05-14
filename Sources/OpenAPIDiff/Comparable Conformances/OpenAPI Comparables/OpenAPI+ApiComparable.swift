@@ -48,8 +48,8 @@ extension OpenAPI.Request: ApiComparable {
     }
 }
 
-extension OpenAPI.PathItem.Operation: ApiComparable {
-    public func compare(to other: OpenAPI.PathItem.Operation, in context: String? = nil) -> ApiDiff {
+extension OpenAPI.Operation: ApiComparable {
+    public func compare(to other: OpenAPI.Operation, in context: String? = nil) -> ApiDiff {
         return .init(
             context: context,
             changes: [
@@ -217,7 +217,7 @@ extension OpenAPI.Server: ApiContext {
     public var apiContext: String { url.absoluteString }
 }
 
-extension OpenAPI.HttpVerb: ApiContext {
+extension OpenAPI.HttpMethod: ApiContext {
     public var apiContext: String { "`\(rawValue)`" }
 }
 

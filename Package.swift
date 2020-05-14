@@ -1,5 +1,4 @@
-// swift-tools-version:5.1
-// The swift-tools-version declares the minimum version of Swift required to build this package.
+// swift-tools-version:5.2
 
 import PackageDescription
 
@@ -10,9 +9,9 @@ let package = Package(
         .executable(name: "openapi-diff", targets: ["openapi-diff"])
     ],
     dependencies: [
-        .package(url: "https://github.com/mattpolzin/OpenAPIKit.git", .upToNextMinor(from: "0.30.0")),
-        .package(url: "https://github.com/jpsim/Yams.git", .upToNextMajor(from: "2.0.0")),
-        .package(url: "https://github.com/apple/swift-argument-parser.git", .upToNextMinor(from: "0.0.2"))
+        .package(url: "https://github.com/mattpolzin/OpenAPIKit", from: "1.0.0"),
+        .package(url: "https://github.com/jpsim/Yams", from: "3.0.0"),
+        .package(url: "https://github.com/apple/swift-argument-parser", .upToNextMinor(from: "0.0.2"))
     ],
     targets: [
         .target(
@@ -23,6 +22,11 @@ let package = Package(
             dependencies: ["OpenAPIDiff"]),
         .target(
             name: "openapi-diff",
-            dependencies: ["OpenAPIDiff", "Yams", "ArgumentParser"])
+            dependencies: [
+                "OpenAPIDiff",
+                "Yams",
+                .product(name: "ArgumentParser", package: "swift-argument-parser")
+            ]
+        )
     ]
 )

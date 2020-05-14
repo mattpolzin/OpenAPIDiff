@@ -7,8 +7,8 @@
 
 import OpenAPIKit
 
-extension OpenAPI.PathItem.Parameter.Context: ApiComparable {
-    public func compare(to other: OpenAPI.PathItem.Parameter.Context, in context: String?) -> ApiDiff {
+extension OpenAPI.Parameter.Context: ApiComparable {
+    public func compare(to other: OpenAPI.Parameter.Context, in context: String?) -> ApiDiff {
         if self == other {
             return .same(context)
         }
@@ -16,8 +16,8 @@ extension OpenAPI.PathItem.Parameter.Context: ApiComparable {
     }
 }
 
-extension OpenAPI.PathItem.Parameter.Schema: ApiComparable {
-    public func compare(to other: OpenAPI.PathItem.Parameter.Schema, in context: String?) -> ApiDiff {
+extension OpenAPI.Parameter.SchemaContext: ApiComparable {
+    public func compare(to other: OpenAPI.Parameter.SchemaContext, in context: String?) -> ApiDiff {
         // TODO: finish writing differ
         return .init(
             context: context,
@@ -31,8 +31,8 @@ extension OpenAPI.PathItem.Parameter.Schema: ApiComparable {
     }
 }
 
-extension OpenAPI.PathItem.Parameter: ApiComparable, Identifiable {
-    public func compare(to other: OpenAPI.PathItem.Parameter, in context: String? = nil) -> ApiDiff {
+extension OpenAPI.Parameter: ApiComparable, Identifiable {
+    public func compare(to other: OpenAPI.Parameter, in context: String? = nil) -> ApiDiff {
         // TODO: finish writing differ
         return .init(
             context: context,
@@ -52,13 +52,13 @@ extension OpenAPI.PathItem.Parameter: ApiComparable, Identifiable {
 
 // MARK: - ApiContext
 
-extension OpenAPI.PathItem.Parameter: ApiContext {
+extension OpenAPI.Parameter: ApiContext {
     public var apiContext: String {
         "\(required ? "_required_ " : "")`\(name)`"
     }
 }
 
-extension OpenAPI.PathItem.Parameter.Context: ApiContext {
+extension OpenAPI.Parameter.Context: ApiContext {
     public var apiContext: String {
         return location.rawValue
     }
