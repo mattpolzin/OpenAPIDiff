@@ -24,21 +24,19 @@ struct OpenAPIDiff: ParsableCommand {
     @Argument()
     var secondFilePath: String
 
-    enum PrintStyle: String, CaseIterable {
+    enum PrintStyle: String, EnumerableFlag {
         case plaintext
         case markdown
         case stats
     }
 
     @Flag(
-        name: .shortAndLong,
-        default: .plaintext,
         help: .init(
             "Print the diff as nested plaintext, a markdown document, or just print stats.",
             discussion: "Only plaintext and markdown printouts are affected by the --skip-schemas option. Stats always prints unfiltered numbers."
         )
     )
-    var printStyle: PrintStyle
+    var printStyle: PrintStyle = .plaintext
 
     @Flag(
         name: [.customLong("skip-schemas")],
@@ -47,7 +45,7 @@ struct OpenAPIDiff: ParsableCommand {
             discussion: "By default, schemas will be diffed. This can produce lengthy diffs and might be distracting from the more salient points of the diff."
         )
     )
-    var skipSchemaDiffs: Bool
+    var skipSchemaDiffs: Bool = false
 
     func run() throws {
         let left = URL(fileURLWithPath: firstFilePath)

@@ -2,7 +2,7 @@
 
 This is a WIP diffing library for OpenAPI documentation. It produces a hierarchical list of changes between two versions of an API. Only OpenAPI v3.x is supported.
 
-Interestingly, at least with the latest builds based on Swift 5.2, the Dockerized app is insanely slow. Building for Mac OS is leagues more efficient. Here's to hoping Swift 5.2.3 improves that situation.
+It uses the Foundation JSONDecoder which is notably slow on Linux. You can save a lot of time by running diffs on YAML files if the Yams parser does an adequate job of parsing your OpenAPI document.
 
 ## Example
 To see an example of what this library produces when run against two YAML OpenAPI documents with the markdown option, take a look at the `example` folder.
