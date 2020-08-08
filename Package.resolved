@@ -15,8 +15,17 @@
         "repositoryURL": "https://github.com/mattpolzin/OpenAPIKit",
         "state": {
           "branch": null,
-          "revision": "b0f5ab383987787bd28ccbc3c28871a9a581504b",
-          "version": "1.4.2"
+          "revision": "4b5f6460fa452b0db0c6e60650ee6348c9f2ee00",
+          "version": "1.5.0"
+        }
+      },
+      {
+        "package": "pure-swift-json",
+        "repositoryURL": "https://github.com/fabianfett/pure-swift-json",
+        "state": {
+          "branch": null,
+          "revision": "5dc8ec1d857f3b56e3a718a01165ae80c7677d48",
+          "version": "0.4.0"
         }
       },
       {
@@ -33,8 +42,8 @@
         "repositoryURL": "https://github.com/apple/swift-argument-parser",
         "state": {
           "branch": null,
-          "revision": "eb51f949cdd0c9d88abba9ce79d37eb7ea1231d0",
-          "version": "0.2.0"
+          "revision": "3e7d2fe99da091dcc1e4a7dd22fc3cfc2dca7937",
+          "version": "0.2.2"
         }
       },
       {
