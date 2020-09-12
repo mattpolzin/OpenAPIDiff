@@ -86,7 +86,7 @@ struct OpenAPIDiff: ParsableCommand {
         let filter: (ApiDiff) -> Bool = { apiDiff in
             let filters: [(ApiDiff) -> Bool] = [
                 { !$0.isSame },
-                self.skipSchemaDiffs ? { $0.context != "schema" } : nil
+                self.skipSchemaDiffs ? { $0.context != ("schema" as String?) } : nil
             ].compactMap { $0 }
 
             return filters.allSatisfy { $0(apiDiff) }
