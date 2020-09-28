@@ -1,0 +1,13 @@
+name: Code Coverage
+
+on: [pull_request]
+
+jobs:
+  codecov:
+    container: 
+      image: swift:5.3-bionic
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - run: swift test --enable-test-discovery --enable-code-coverage
+    - uses: mattpolzin/swift-codecov-action@0.4.0

@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/mattpolzin/OpenAPIKit.git",
         "state": {
           "branch": null,
-          "revision": "d7a08cb788e77e7a0d9ccb4dad93992a4eaeb4d1",
-          "version": "2.0.0-alpha.4"
+          "revision": "dea99e8bb5d8241c5c9f815d0fb0ad487b9491b0",
+          "version": "2.0.0"
         }
       },
       {
@@ -42,8 +42,8 @@
         "repositoryURL": "https://github.com/apple/swift-argument-parser.git",
         "state": {
           "branch": null,
-          "revision": "3e7d2fe99da091dcc1e4a7dd22fc3cfc2dca7937",
-          "version": "0.2.2"
+          "revision": "92646c0cdbaca076c8d3d0207891785b3379cbff",
+          "version": "0.3.1"
         }
       },
       {
@@ -51,8 +51,8 @@
         "repositoryURL": "https://github.com/jpsim/Yams.git",
         "state": {
           "branch": null,
-          "revision": "81a65c4069c28011ee432f2858ba0de49b086677",
-          "version": "3.0.1"
+          "revision": "88caa2e6fffdbef2e91c2022d038576062042907",
+          "version": "4.0.0"
         }
       }
     ]
