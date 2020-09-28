@@ -163,12 +163,20 @@ extension OpenAPI.Server.Variable: ApiComparable {
     }
 }
 
+extension URLTemplate: ApiComparable {
+    public func compare(to other: URLTemplate, in context: String? = nil) -> ApiDiff {
+        guard self != other else { return .same(context) }
+
+        return .changed(context: context, from: self.absoluteString, to: other.absoluteString)
+    }
+}
+
 extension OpenAPI.Server: ApiComparable {
     public func compare(to other: OpenAPI.Server, in context: String?) -> ApiDiff {
         return .init(
             context: context,
             changes: [
-                url.compare(to: other.url, in: "URL"),
+                urlTemplate.compare(to: other.urlTemplate, in: "URL"),
                 description.compare(to: other.description, in: "description"),
                 variables.compare(to: other.variables, in: "variables")
             ]
@@ -214,7 +222,7 @@ extension OpenAPI.Path: ApiContext {
 }
 
 extension OpenAPI.Server: ApiContext {
-    public var apiContext: String { url.absoluteString }
+    public var apiContext: String { urlTemplate.absoluteString }
 }
 
 extension OpenAPI.HttpMethod: ApiContext {
