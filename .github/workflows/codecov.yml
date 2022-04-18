@@ -5,7 +5,7 @@ on: [pull_request]
 jobs:
   codecov:
     container: 
-      image: swift:5.4-bionic
+      image: swift:5.5-bionic
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
