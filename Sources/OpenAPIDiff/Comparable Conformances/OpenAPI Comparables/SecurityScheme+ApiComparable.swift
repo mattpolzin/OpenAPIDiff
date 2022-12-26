@@ -68,6 +68,8 @@ extension OpenAPI.SecurityScheme.SecurityType {
             return "oauth2"
         case .openIdConnect:
             return "openIdConnect"
+        case .mutualTLS:
+            return "mutualTLS"
         }
     }
 }
