@@ -42,15 +42,6 @@ struct OpenAPIDiff: ParsableCommand {
     var printStyle: PrintStyle = .plaintext
 
     @Flag(
-        name: .customLong("fast"),
-        help: .init(
-            "Parse the input OpenAPI more quickly when possible.",
-            discussion: "This option currently only affects JSON parsing. Especially in Linux environments, the speed boost can be very substantial.\n\nThere is no inherent quality/speed tradeoff in play, but the parser this option uses is less battle tested so if stability is more important than speed, do not use this option."
-        )
-    )
-    var fastParsing: Bool = false
-
-    @Flag(
         name: [.customLong("skip-schemas")],
         help: .init(
             "Don't compare OpenAPI Schema Objects.",
@@ -72,21 +63,12 @@ struct OpenAPIDiff: ParsableCommand {
             let file1 = try! Data(contentsOf: left)
             let file2 = try! Data(contentsOf: right)
 
-            if (fastParsing) {
-                api1V3 = try? PSJSONDecoder().decode(OpenAPI.Document.self, from: file1)
-                api1 = api1V3?.convert(to: .v3_1_0) ??
-                    (try! PSJSONDecoder().decode(OpenAPI.Document.self, from: file1))
-                api2V3 = try? PSJSONDecoder().decode(OpenAPI.Document.self, from: file2)
-                api2 = api2V3?.convert(to: .v3_1_0) ??
-                    (try! PSJSONDecoder().decode(OpenAPI.Document.self, from: file2))
-            } else {
-                api1V3 = try? JSONDecoder().decode(OpenAPI.Document.self, from: file1)
-                api1 = api1V3?.convert(to: .v3_1_0) ??
-                    (try! JSONDecoder().decode(OpenAPI.Document.self, from: file1))
-                api2V3 = try? JSONDecoder().decode(OpenAPI.Document.self, from: file2)
-                api2 = api2V3?.convert(to: .v3_1_0) ??
-                    (try! JSONDecoder().decode(OpenAPI.Document.self, from: file2))
-            }
+            api1V3 = try? JSONDecoder().decode(OpenAPI.Document.self, from: file1)
+            api1 = api1V3?.convert(to: .v3_1_0) ??
+                (try! JSONDecoder().decode(OpenAPI.Document.self, from: file1))
+            api2V3 = try? JSONDecoder().decode(OpenAPI.Document.self, from: file2)
+            api2 = api2V3?.convert(to: .v3_1_0) ??
+                (try! JSONDecoder().decode(OpenAPI.Document.self, from: file2))
         } else {
             let file1 = try! String(contentsOf:  left)
             let file2 = try! String(contentsOf: right)
