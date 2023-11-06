@@ -1,4 +1,4 @@
-FROM swift:5.2 as build
+FROM swift:5.9 as build
 
 WORKDIR /build
 
@@ -12,7 +12,7 @@ RUN swift build -c release --enable-test-discovery
 
 # ----------------
 
-FROM swift:5.2-slim
+FROM swift:5.9-slim
 
 WORKDIR /api
 

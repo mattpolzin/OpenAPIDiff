@@ -2,8 +2,6 @@
 
 This is a WIP diffing library for OpenAPI documentation. It produces a hierarchical list of changes between two versions of an API. Only OpenAPI v3.x is supported.
 
-By default, it uses the Foundation JSONDecoder which battle-tested but notably slow on Linux. You can save a lot of time by passing the `--fast` flag or running diffs on YAML files if the Yams parser does an adequate job of parsing your OpenAPI document.
-
 ## Example
 To see an example of what this library produces when run against two YAML OpenAPI documents with the markdown option, take a look at the `example` folder.
 
@@ -18,8 +16,6 @@ docker run --rm -v "$(pwd)/old.json:/api/old.json" -v "$(pwd)/new.json:/api/new.
 
 You can pass `mattpolzin2/openapi-diff` the `--markdown` flag in addition to the two API document files to produce a markdown diff instead of the default plaintext diff.
 
-You can pass `mattpolzin2/openapi-diff` the `--fast` flag to use faster (though less battle-tested) JSON parsing. The flag currently has no effect on YAML parsing.
-
 For all options, see the `--help`.
 
 ### Library
@@ -28,7 +24,7 @@ As a library, you first reference this package from your manifest or pull it in 
 ```swift
 ...
 dependencies: [
-  .package(url: "https://github.com/mattpolzin/OpenAPIDiff.git", .upToNextMinor(from: "0.2.0")),
+  .package(url: "https://github.com/mattpolzin/OpenAPIDiff.git", .upToNextMinor(from: "0.7.0")),
   ...
 ],
 ...
@@ -58,6 +54,8 @@ let markdownDifferences = comparison.markdownDescription { !$0.isSame }
 ```
 
 The structure you are producing is `ApiDiff`. You can take a look at `ApiDiff.swift` if you want to operate on the diff in some way different than the `description()` and `markdownDescription()` methods do.
+
+If you need to diff an OAS 3.0 document, you can decode it and then convert it to an OAS 3.1 document in order to semantically diff it. You can see an example of this in the executable target for this project (see `main.swift`).
 
 ## Building From Source
 The library target (`OpenAPIDiff`) and executable target (`openapi-diff`) can both be built quite easily with either `swift build` or by opening the repository root folder in Xcode 11.

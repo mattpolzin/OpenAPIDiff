@@ -116,9 +116,24 @@ extension OpenAPI.Document.Info.License: ApiComparable {
             context: context,
             changes: [
                 name.compare(to: other.name, in: "name"),
-                url.compare(to: other.url, in: "URL")
+                identifier.compare(to: other.identifier)
             ]
         )
+    }
+}
+
+extension OpenAPI.Document.Info.License.Identifier: ApiComparable {
+    public func compare(to other: OpenAPI.Document.Info.License.Identifier, in context: String?) -> ApiDiff {
+        switch(self, other) {
+        case (.spdx(let id1), .spdx(let id2)):
+            return id1.compare(to: id2, in: "identifier")
+        case (.url(let url1), .url(let url2)):
+            return url1.compare(to: url2, in: "url")
+        case (.spdx(let id), .url(let url)):
+            return .changed(context: "identifier", from: "the identifier \(id)", to: "the url \(url)")
+        case (.url(let url), .spdx(let id)):
+            return .changed(context: "url", from: "the url \(url)", to: "the identifier \(id)")
+        }
     }
 }
 
