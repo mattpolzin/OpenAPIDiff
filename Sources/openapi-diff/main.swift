@@ -11,7 +11,6 @@ import OpenAPIKit30
 import OpenAPIKitCompat
 import OpenAPIDiff
 import Yams
-import PureSwiftJSON
 import ArgumentParser
 
 struct OpenAPIDiff: ParsableCommand {
