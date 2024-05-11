@@ -14,9 +14,22 @@ extension OpenAPI.Content: ApiComparable {
             context: context,
             changes: [
                 schema.compare(to: other.schema, in: "schema"),
-//                example.compare(to: other.example, in: "example"),
-//                examples.compare(to: other.examples, in: "examples"),
+                String(describing: example).compare(to: String(describing: other.example), in: "example"),
+                examples.compare(to: other.examples, in: "examples"),
 //                encoding.compare(to: other.encoding, in: "encoding")
+            ]
+        )
+    }
+}
+
+extension OpenAPI.Example: ApiComparable {
+    public func compare(to other: OpenAPI.Example, in context: String?) -> ApiDiff {
+        return .init(
+            context: context,
+            changes: [
+                summary.compare(to: other.summary, in: "summary"),
+                description.compare(to: other.description, in: "description"),
+                String(describing: value).compare(to: String(describing: other.value), in: "value")
             ]
         )
     }
@@ -28,8 +41,22 @@ extension OpenAPI.Response: ApiComparable {
             context: context,
             changes: [
                 description.compare(to: other.description, in: "description"),
-//                headers.compare(to: other.headers, in: "headers"),
+                headers.compare(to: other.headers, in: "headers"),
                 content.compare(to: other.content, in: "content")
+            ]
+        )
+    }
+}
+
+extension OpenAPI.Header: ApiComparable {
+    public func compare(to other: OpenAPI.Header, in context: String?) -> ApiDiff {
+        return .init(
+            context: context,
+            changes: [
+                description.compare(to: other.description, in: "description"),
+                required.compare(to: other.required, in: "required"),
+                deprecated.compare(to: other.deprecated, in: "deprecated"),
+                schemaOrContent.compare(to: other.schemaOrContent, in: "schema or content")
             ]
         )
     }
@@ -214,7 +241,6 @@ extension OpenAPI.Tag: ApiComparable {
 
 extension OpenAPI.Document: ApiComparable {
     public func compare(to other: OpenAPI.Document, in context: String? = nil) -> ApiDiff {
-        // TODO: finish differ
         return .init(
             context: context ?? apiContext,
             changes: [
@@ -222,10 +248,32 @@ extension OpenAPI.Document: ApiComparable {
                 info.compare(to: other.info, in: "info"),
                 servers.compare(to: other.servers, in: "servers"),
                 paths.compare(to: other.paths, in: "paths"),
-//                components.compare(to: other.components, in: "components"),
+                components.compare(to: other.components, in: "components"),
+                webhooks.compare(to: other.webhooks, in: "webhooks"),
                 security.compare(to: other.security, in: "security"),
                 tags.compare(to: other.tags, in: "tags"),
                 externalDocs.compare(to: other.externalDocs, in: "external docs")
+            ]
+        )
+    }
+}
+
+extension OpenAPI.Components: ApiComparable {
+    public func compare(to other: OpenAPI.Components, in context: String? = nil) -> ApiDiff {
+        // TODO: finish implementation
+        return .init(
+            context: context ?? "components",
+            changes: [
+                schemas.compare(to: other.schemas, in: "schemas"),
+                responses.compare(to: other.responses, in: "responses"),
+                parameters.compare(to: other.parameters, in: "parameters"),
+                examples.compare(to: other.examples, in: "examples"),
+                requestBodies.compare(to: other.requestBodies, in: "requestBodies"),
+                headers.compare(to: other.headers, in: "headers"),
+                securitySchemes.compare(to: other.securitySchemes, in: "securitySchemes"),
+//                links.compare(to: other.links, in: "links"),
+                callbacks.compare(to: other.callbacks, in: "callbacks"),
+                pathItems.compare(to: other.pathItems, in: "path items")
             ]
         )
     }
