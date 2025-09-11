@@ -1,4 +1,4 @@
-FROM swift:5.9 as build
+FROM swift:5.10 as build
 
 WORKDIR /build
 
