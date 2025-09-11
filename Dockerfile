@@ -1,4 +1,4 @@
-FROM swift:5.10 as build
+FROM swift:6.1 AS build
 
 WORKDIR /build
 
@@ -8,11 +8,11 @@ RUN swift package resolve
 
 COPY . .
 
-RUN swift build -c release --enable-test-discovery
+RUN swift build -c release
 
 # ----------------
 
-FROM swift:5.9-slim
+FROM swift:6.1-slim
 
 WORKDIR /api
 
