@@ -5,9 +5,9 @@ on: [pull_request]
 jobs:
   codecov:
     container: 
-      image: swift:5.10-focal
+      image: swift:6.1
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v5
     - run: swift test --enable-test-discovery --enable-code-coverage
     - uses: mattpolzin/swift-codecov-action@0.7.5
