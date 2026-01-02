@@ -1,4 +1,4 @@
-FROM swift:6.1 AS build
+FROM swift:6.2 AS build
 
 WORKDIR /build
 
@@ -12,7 +12,7 @@ RUN swift build -c release
 
 # ----------------
 
-FROM swift:6.1-slim
+FROM swift:6.2-slim
 
 WORKDIR /api
 

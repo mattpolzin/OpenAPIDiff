@@ -63,20 +63,20 @@ struct OpenAPIDiff: ParsableCommand {
             let file2 = try! Data(contentsOf: right)
 
             api1V3 = try? JSONDecoder().decode(OpenAPI.Document.self, from: file1)
-            api1 = api1V3?.convert(to: .v3_1_0) ??
+            api1 = api1V3?.convert(to: .v3_2_0) ??
                 (try! JSONDecoder().decode(OpenAPI.Document.self, from: file1))
             api2V3 = try? JSONDecoder().decode(OpenAPI.Document.self, from: file2)
-            api2 = api2V3?.convert(to: .v3_1_0) ??
+            api2 = api2V3?.convert(to: .v3_2_0) ??
                 (try! JSONDecoder().decode(OpenAPI.Document.self, from: file2))
         } else {
             let file1 = try! String(contentsOf:  left)
             let file2 = try! String(contentsOf: right)
 
             api1V3 = try? YAMLDecoder().decode(OpenAPI.Document.self, from: file1)
-            api1 = api1V3?.convert(to: .v3_1_0) ??
+            api1 = api1V3?.convert(to: .v3_2_0) ??
                 (try! YAMLDecoder().decode(OpenAPI.Document.self, from: file1))
             api2V3 = try? YAMLDecoder().decode(OpenAPI.Document.self, from: file2)
-            api2 = api2V3?.convert(to: .v3_1_0) ??
+            api2 = api2V3?.convert(to: .v3_2_0) ??
                 (try! YAMLDecoder().decode(OpenAPI.Document.self, from: file2))
         }
 

@@ -1,13 +1,10 @@
 //
 //  ApiDiff.swift
 //  
-//
-//  Created by Mathew Polzin on 2/13/20.
-//
 
 import Foundation
 
-public struct ApiDiff: CustomStringConvertible, Equatable, Comparable {
+public struct ApiDiff: CustomStringConvertible, Equatable, Comparable, Sendable {
     public let context: String?
     public let diff: Diff
 
@@ -76,7 +73,7 @@ public struct ApiDiff: CustomStringConvertible, Equatable, Comparable {
         }
     }
 
-    public enum Diff: Equatable, Comparable {
+    public enum Diff: Equatable, Comparable, Sendable {
         case same
         case removed
         case added

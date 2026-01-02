@@ -1,12 +1,13 @@
 {
+  "originHash" : "022033ada335fe1b0f4080b896f75fb44009d4235d6e990d94fcf9049aedf7cf",
   "pins" : [
     {
       "identity" : "openapikit",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mattpolzin/OpenAPIKit.git",
       "state" : {
-        "revision" : "eae73235dd6a8fb9177a75da929e8bbd637c1285",
-        "version" : "4.0.1"
+        "revision" : "d267e29373b3d2ff395d3b46d8bf2085a9263f67",
+        "version" : "5.0.0-rc.2"
       }
     },
     {
@@ -14,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-argument-parser.git",
       "state" : {
-        "revision" : "8f4d2753f0e4778c76d5f05ad16c74f707390531",
-        "version" : "1.2.3"
+        "revision" : "c5d11a805e765f52ba34ec7284bd4fcd6ba68615",
+        "version" : "1.7.0"
       }
     },
     {
@@ -23,10 +24,10 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/jpsim/Yams.git",
       "state" : {
-        "revision" : "9281f8c99aff4f4a55dce22ae29b1181c935caa5",
-        "version" : "6.0.0"
+        "revision" : "51b5127c7fb6ffac106ad6d199aaa33c5024895f",
+        "version" : "6.2.0"
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }
