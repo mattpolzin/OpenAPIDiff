@@ -37,7 +37,7 @@ extension OpenAPI.SecurityScheme.SecurityType: ApiComparable {
                     bearerFormat1.compare(to: bearerFormat2)
                 ]
             )
-        case (.oauth2(let flows1), .oauth2(let flows2)):
+        case (.oauth2(flows: let flows1, metadataUrl: _), .oauth2(flows: let flows2, metadataUrl: _)):
             return .init(
                 context: context,
                 changes: [
