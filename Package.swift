@@ -13,7 +13,7 @@ let package = Package(
         .executable(name: "openapi-diff", targets: ["openapi-diff"])
     ],
     dependencies: [
-        .package(url: "https://github.com/mattpolzin/OpenAPIKit.git", from: "5.0.0-rc.2"),
+        .package(url: "https://github.com/mattpolzin/OpenAPIKit.git", from: "5.0.0"),
         .package(url: "https://github.com/jpsim/Yams.git", from: "6.2.0"),
         .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.7.0"),
     ],
